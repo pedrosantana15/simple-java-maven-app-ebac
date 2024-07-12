@@ -1,24 +1,14 @@
 pipeline {
-    agent any
-
-    environment {
-        // Define a variável de ambiente com o caminho absoluto do workspace no formato Unix
-        WORKSPACE_UNIX = bat(script: 'echo %cd:/=/%', returnStdout: true).trim()
+    agent {
+        docker {
+            image 'maven:3.9.0'
+            args '-v /root/.m2:/root/.m2'
+        }
     }
-
     stages {
         stage('Build') {
             steps {
-                script {
-                    // Executa o comando Docker para construir o projeto Maven
-                    def dockerCmd = "docker run --rm -v ${WORKSPACE_UNIX}:/workspace -w /workspace maven:3.9.0 mvn -B -DskipTests clean package"
-                    
-                    // Imprime o comando Docker para depuração
-                    echo "Running Docker command: ${dockerCmd}"
-                    
-                    // Executa o comando Docker
-                    sh dockerCmd
-                }
+                sh 'mvn -B -DskipTests clean package'
             }
         }
     }
