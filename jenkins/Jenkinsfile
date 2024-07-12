@@ -17,7 +17,11 @@ pipeline {
                     echo "Running Docker command: ${dockerCmd}"
                     
                     // Executa o comando Docker
-                    sh dockerCmd
+                    def dockerRun = bat(script: dockerCmd, returnStatus: true)
+                    
+                    if (dockerRun != 0) {
+                        error "Failed to run Docker command"
+                    }
                 }
             }
         }
