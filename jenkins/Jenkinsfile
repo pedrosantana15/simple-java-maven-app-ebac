@@ -4,18 +4,22 @@ pipeline {
             image 'maven:3.9.0'
             args '-v /root/.m2:/root/.m2'
         }
-    }
     stages {
         stage('Build') {
             steps {
                 script {
+                    // Obter o caminho do workspace no formato Windows
+                    def workspacePath = pwd()
+                    
                     // Converter o caminho para o formato Unix
-                    def workspaceUnixPath = pwd().replace('\\', '/').replace('C:', '/c')
+                    def workspaceUnixPath = workspacePath.replace('\\', '/').replace('C:', '/c')
+                    
                     echo "Workspace Unix Path: ${workspaceUnixPath}"
+                    
+                    // Executar o comando Docker com o caminho convertido
                     sh "docker run --rm -v ${workspaceUnixPath}:/workspace -w /workspace maven:3.9.0 mvn -B -DskipTests clean package"
                 }
             }
         }
     }
 }
-
